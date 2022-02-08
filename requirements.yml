@@ -1,0 +1,17 @@
+name: ML
+channels:
+  - conda-forge
+#   - anaconda
+  - defaults
+dependencies:
+  - python=3.9.7
+  - scikit-learn=1.0.2
+  - matplotlib=3.5.0
+  - pandas=1.3.4
+  - seaborn=0.11.1
+  # - pip:
+  #   - graphviz==0.10.1
+  #   - pydot==1.4.1
+  #   - git+git://github.com/ezerilli/mlrose
+  #   - mujoco-py<2.1,>=2.0
+  #   - gym[all]

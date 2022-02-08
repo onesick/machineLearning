@@ -1,0 +1,2 @@
+# To delete this page later, not being used. Using Conda instead.
+scikit-learn==1.0.2
