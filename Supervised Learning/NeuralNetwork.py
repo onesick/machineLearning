@@ -7,7 +7,9 @@ class NeuralNetwork():
     def __init__(self,
                  hidden_layer_sizes=(10,),
                  activation='relu',
-                 solver='lbfgs'
+                 solver='lbfgs',
+                 alpha=0.0001,
+                 learning_rate=0.001
                 ):
         # TODO: Try out the learner without preprocessed model VS raw model
         # self.model = 
@@ -15,7 +17,9 @@ class NeuralNetwork():
                                 ('NeuralNetwork', MLPClassifier(
                                     hidden_layer_sizes=hidden_layer_sizes,
                                     activation=activation,
-                                    solver=solver
+                                    solver=solver,
+                                    alpha=alpha,
+                                    learning_rate=learning_rate
                                     )
                                 )]
                             )

@@ -100,23 +100,23 @@ def plot_learning_curve(learner, x_train, y_train, **kwargs):
         # Save figure
         plt.savefig(IMAGE_DIR + '{}_learning_curve'.format(learner.model))
 
-def plot_model_complexity(learner, x_train, y_train, param_name, param_range, **kwargs):
+def plot_model_complexity(learner, x_train, y_train, param_name, param_range, xlabel='Max Tree Depth', ylabel='Accuracy', xscale='linear', **kwargs):
     train_scores, val_scores = validation_curve(learner.model, x_train, y_train,
                                                  param_name=param_name, param_range=param_range, cv=kwargs['cv'])
     plt.figure()
     _plot_helper_(param_range, train_scores, val_scores, "Training", "Cross Validation")
     plt.title('{} - Validation curves using {}-Fold Cross Validation'.format(learner.model, kwargs['cv']))
     plt.legend(loc='lower left')
-    plt.xlabel('Max Tree Depth')
-    plt.ylabel('Accuracy')
-    plt.xscale('linear')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.xscale(xscale)
     if kwargs['y_lim']:
             plt.ylim(kwargs['y_lim'], 1.01)
     # Save figure
     plt.savefig(IMAGE_DIR + '{}_model_complexity'.format(learner.model))
 
 
-def performDTExperiments(data, clf):
+def performExperiments(data, clf, train_size=np.linspace(0.1, 1.0, 5), cv=5, y_lim=0.4, param_name="max_depth", param_range=list(range(1, 50))):
     print("Starting experiments on {}".format(clf))
     n_samples = len(data.images)
 
@@ -129,12 +129,11 @@ def performDTExperiments(data, clf):
     predicted = clf.predict(X_test)
 
     # plot learning curve
-    # TODO: try to change train sizes and see how they are affected
-    train_size = np.linspace(0.1, 1.0, 5)
-    f1_scorer = make_scorer(f1_accuracy) # later, if I want to pass f1 scorer, I send this out
-    plot_learning_curve(clf, X_train, y_train, cv=5, y_lim=0.4, train_sizes=train_size)
 
-    plot_model_complexity(clf, X_train, y_train, "max_depth", list(range(1, 50)), cv=5, y_lim=0.4)
+    f1_scorer = make_scorer(f1_accuracy) # later, if I want to pass f1 scorer, I send this out
+    plot_learning_curve(clf, X_train, y_train, cv=cv, y_lim=y_lim, train_sizes=train_size)
+
+    plot_model_complexity(clf, X_train, y_train, param_name, param_range, cv=cv, y_lim=y_lim)
 
     print(
         f"Classification report for classifier {clf}:\n"
@@ -147,9 +146,7 @@ def performDTExperiments(data, clf):
     )
 
 
-def performNNExperiment(data, clf):
-    # dosomething
-    data
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='start of experiment')
@@ -169,6 +166,8 @@ if __name__ == '__main__':
     data = datasets.load_digits()
     # print(pd.DataFrame(data.data).head())
     # print(plt.imshow(data.images[0]))
-    performDTExperiments(data, dtLearner)
-    performNNExperiment(data, nerualNet)
+    performExperiments(data, dtLearner)
+    # performExperiments(data, nerualNet)
+
+    # TODO: implement neural network parameters for analysis
     
