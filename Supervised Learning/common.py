@@ -4,7 +4,9 @@ from sklearn import metrics, datasets
 from sklearn.preprocessing import StandardScaler 
 from DecisionTree import DecisionTree
 from NeuralNetwork import NeuralNetwork
-
+from KNN import KNN
+from AdaBoosting import AdaBoost
+from SVM import SVM
 import argparse
 import numpy as np
 import pandas as pd
@@ -12,6 +14,8 @@ import pandas as pd
 from sklearn.metrics import make_scorer, accuracy_score, f1_score, confusion_matrix
 from sklearn.pipeline import Pipeline
 from sklearn.utils import compute_sample_weight
+from sklearn.datasets import make_moons
+
 
 IMAGE_DIR = 'images/'
 # Adapted from https://github.com/JonathanTay/CS-7641-assignment-1/blob/master/helpers.py
@@ -103,6 +107,7 @@ def plot_learning_curve(learner, x_train, y_train, **kwargs):
 def plot_model_complexity(learner, x_train, y_train, param_name, param_range, xlabel='Max Tree Depth', ylabel='Accuracy', xscale='linear', **kwargs):
     train_scores, val_scores = validation_curve(learner.model, x_train, y_train,
                                                  param_name=param_name, param_range=param_range, cv=kwargs['cv'])
+    print(train_scores, val_scores)
     plt.figure()
     _plot_helper_(param_range, train_scores, val_scores, "Training", "Cross Validation")
     plt.title('{} - Validation curves using {}-Fold Cross Validation'.format(learner.model, kwargs['cv']))
@@ -116,7 +121,7 @@ def plot_model_complexity(learner, x_train, y_train, param_name, param_range, xl
     plt.savefig(IMAGE_DIR + '{}_model_complexity'.format(learner.model))
 
 
-def performExperiments(data, clf, train_size=np.linspace(0.1, 1.0, 5), cv=5, y_lim=0.4, param_name="max_depth", param_range=list(range(1, 50))):
+def performExperiments(data, clf, train_size=np.linspace(0.1, 1.0, 5), cv=5, y_lim=0.4, xlabel='Max Tree Depth', ylabel='Accuracy', xscale='linear', param_name="max_depth", param_range=list(range(1, 50))):
     print("Starting experiments on {}".format(clf))
     n_samples = len(data.images)
 
@@ -133,8 +138,19 @@ def performExperiments(data, clf, train_size=np.linspace(0.1, 1.0, 5), cv=5, y_l
     f1_scorer = make_scorer(f1_accuracy) # later, if I want to pass f1 scorer, I send this out
     plot_learning_curve(clf, X_train, y_train, cv=cv, y_lim=y_lim, train_sizes=train_size)
 
-    plot_model_complexity(clf, X_train, y_train, param_name, param_range, cv=cv, y_lim=y_lim)
+    plot_model_complexity(clf, X_train, y_train, param_name, param_range, cv=cv, y_lim=y_lim, xlabel=xlabel, ylabel=ylabel, xscale=xscale)
 
+    print(
+        f"Classification report for classifier {clf}:\n"
+        f"{metrics.classification_report(y_test, predicted)}\n"
+    )
+
+    print(
+        f"Confusion matrix report for classifier {clf}:\n"
+        f"{confusion_matrix(y_test, predicted)}"
+    )
+
+def generateReport(clf, y_test, predicted):
     print(
         f"Classification report for classifier {clf}:\n"
         f"{metrics.classification_report(y_test, predicted)}\n"
@@ -147,7 +163,6 @@ def performExperiments(data, clf, train_size=np.linspace(0.1, 1.0, 5), cv=5, y_l
 
 
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='start of experiment')
     parser.add_argument('--seed', type=int, help='A random seed to set, if desired')
@@ -157,17 +172,68 @@ if __name__ == '__main__':
         seed = np.random.randint(0, (2 ** 32) - 1, dtype='uint64')
         print("Using seed {}".format(seed))
 
-    # Instantiate decision tree
-    dtLearner = DecisionTree()
-    # Instantiate Neural Net
-    nerualNet = NeuralNetwork()
 
     # loading data
     data = datasets.load_digits()
-    # print(pd.DataFrame(data.data).head())
-    # print(plt.imshow(data.images[0]))
-    performExperiments(data, dtLearner)
-    # performExperiments(data, nerualNet)
+    n_samples = len(data.images)
+    X_train, X_test, y_train, y_test = train_test_split(
+    data.images.reshape((n_samples, -1)), data.target, test_size=0.2, shuffle=True
+    )
 
-    # TODO: implement neural network parameters for analysis
-    
+
+    """
+    Start of decision tree
+    """
+    # dtLearner = DecisionTree(max_depth=9, min_samples_leaf=7, max_features="auto")
+    # performExperiments(data, dtLearner)
+   
+    """
+    Start of Neural net experiement
+    """
+    # testing different hidden layer sizes
+    neuralNet = NeuralNetwork()
+    neuralNet.fit(X_train,y_train)
+    y_pred = neuralNet.predict(X_test)
+    generateReport(neuralNet, y_test, y_pred)
+    # performExperiments(data, nerualNet, xlabel="hidden layer size", xscale = 'log', param_name='NeuralNetwork__hidden_layer_sizes', param_range=np.logspace(-7, 3, 3))
+
+    # learning_rates = sorted([0.00001*10**x for x in range(4)])
+    # performExperiments(data, nerualNet, xlabel="learning rate", xscale = 'log', param_name='NeuralNetwork__learning_rate_init', param_range=learning_rates)
+
+    """
+    start of KNN
+    """
+    # knn = KNN()
+
+    # grid_search = knn.findBestK(X_train, y_train)
+    # print('grid search result for KNN')
+    # print(grid_search.best_params_)
+    # print(grid_search.best_score_)
+
+    # knn.bestModel(**grid_search.best_params_)
+    # knn.fit(X_train, y_train)
+    # y_pred = knn.predict(X_test)
+    # generateReport(knn.model, y_test, y_pred)
+
+    """
+    start of boosting
+    """
+    # adaBoost = AdaBoost()
+    # adaBoost.fit(X_train, y_train)
+    # y_pred = adaBoost.predict(X_test)
+    # adaBoost.plot_learning_curve(adaBoost, X_train, y_train, y_test, y_pred, cv=5, y_lim=0.4)
+
+    """
+    start of SVM
+    """
+    # svm = SVM()
+    # svm.fit(X_train, y_train)
+    # y_pred = svm.predict(X_test)
+    # generateReport(svm.model, y_test, y_pred)
+    # svm.setPolyKernal()
+    # search = svm.findBestParams(X_train, y_train)
+    # print(search.best_estimator_)
+    # print(search.best_score_)
+    # search.fit(X_train, y_train)
+    # y_pred= search.predict(X_test)
+    # generateReport(search, y_test, y_pred)

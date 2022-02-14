@@ -1,4 +1,3 @@
-# machineLearning
 repo: https://github.com/onesick/machineLearning
 
 run conda requirements for environment set up.
