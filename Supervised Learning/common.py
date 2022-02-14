@@ -195,45 +195,45 @@ if __name__ == '__main__':
     neuralNet.fit(X_train,y_train)
     y_pred = neuralNet.predict(X_test)
     generateReport(neuralNet, y_test, y_pred)
-    # performExperiments(data, nerualNet, xlabel="hidden layer size", xscale = 'log', param_name='NeuralNetwork__hidden_layer_sizes', param_range=np.logspace(-7, 3, 3))
+    performExperiments(data, nerualNet, xlabel="hidden layer size", xscale = 'log', param_name='NeuralNetwork__hidden_layer_sizes', param_range=np.logspace(-7, 3, 3))
 
-    # learning_rates = sorted([0.00001*10**x for x in range(4)])
-    # performExperiments(data, nerualNet, xlabel="learning rate", xscale = 'log', param_name='NeuralNetwork__learning_rate_init', param_range=learning_rates)
+    learning_rates = sorted([0.00001*10**x for x in range(4)])
+    performExperiments(data, nerualNet, xlabel="learning rate", xscale = 'log', param_name='NeuralNetwork__learning_rate_init', param_range=learning_rates)
 
     """
     start of KNN
     """
-    # knn = KNN()
+    knn = KNN()
 
-    # grid_search = knn.findBestK(X_train, y_train)
-    # print('grid search result for KNN')
-    # print(grid_search.best_params_)
-    # print(grid_search.best_score_)
+    grid_search = knn.findBestK(X_train, y_train)
+    print('grid search result for KNN')
+    print(grid_search.best_params_)
+    print(grid_search.best_score_)
 
-    # knn.bestModel(**grid_search.best_params_)
-    # knn.fit(X_train, y_train)
-    # y_pred = knn.predict(X_test)
-    # generateReport(knn.model, y_test, y_pred)
+    knn.bestModel(**grid_search.best_params_)
+    knn.fit(X_train, y_train)
+    y_pred = knn.predict(X_test)
+    generateReport(knn.model, y_test, y_pred)
 
     """
     start of boosting
     """
-    # adaBoost = AdaBoost()
-    # adaBoost.fit(X_train, y_train)
-    # y_pred = adaBoost.predict(X_test)
-    # adaBoost.plot_learning_curve(adaBoost, X_train, y_train, y_test, y_pred, cv=5, y_lim=0.4)
+    adaBoost = AdaBoost()
+    adaBoost.fit(X_train, y_train)
+    y_pred = adaBoost.predict(X_test)
+    adaBoost.plot_learning_curve(adaBoost, X_train, y_train, y_test, y_pred, cv=5, y_lim=0.4)
 
     """
     start of SVM
     """
-    # svm = SVM()
-    # svm.fit(X_train, y_train)
-    # y_pred = svm.predict(X_test)
-    # generateReport(svm.model, y_test, y_pred)
-    # svm.setPolyKernal()
-    # search = svm.findBestParams(X_train, y_train)
-    # print(search.best_estimator_)
-    # print(search.best_score_)
-    # search.fit(X_train, y_train)
-    # y_pred= search.predict(X_test)
-    # generateReport(search, y_test, y_pred)
+    svm = SVM()
+    svm.fit(X_train, y_train)
+    y_pred = svm.predict(X_test)
+    generateReport(svm.model, y_test, y_pred)
+    svm.setPolyKernal()
+    search = svm.findBestParams(X_train, y_train)
+    print(search.best_estimator_)
+    print(search.best_score_)
+    search.fit(X_train, y_train)
+    y_pred= search.predict(X_test)
+    generateReport(search, y_test, y_pred)
