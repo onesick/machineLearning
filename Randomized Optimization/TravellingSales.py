@@ -15,6 +15,10 @@ fitness_coords = mlrose_hiive.TravellingSales(coords = coords_list)
 problem_fit = mlrose_hiive.TSPOpt(length = 8, fitness_fn = fitness_coords, maximize=True)
 
 
+flip_flop_problem_fit = mlrose_hiive.DiscreteOpt(length=100, fitness_fn=mlrose_hiive.FlipFlop())
+
+
+sixPeak_problem_fit = mlrose_hiive.DiscreteOpt(length=100, fitness_fn=mlrose_hiive.SixPeaks())
 
 
 saSettings = []
@@ -99,12 +103,15 @@ def mimic_plot(problem_fit, title='title'):
 if __name__ == '__main__':
     
     
-    # //TODO: add all the curve and plots
     comparison_x = []
     comparison_y = []
     problems = []
     problems.append((problem_fit, 'TSP'))
-    
+    problems.append((flip_flop_problem_fit, 'Flip'))
+    problems.append((sixPeak_problem_fit, 'SixPeak'))
+    # rhc_fitness, rhc_curve = rhc_plot(sixPeak_problem_fit, "title")
+    # print(rhc_fitness)
+    # print(rhc_curve)
     for (problem_fit, title) in problems:
         sa_fitness, sa_curve = sa_plot(saSettings, problem_fit, title)
         
@@ -122,30 +129,32 @@ if __name__ == '__main__':
         legend = '{}'.format("mimic")
         plt.plot(mimic_curve[:,1], mimic_curve[:,0], label=legend)
         plt.legend(loc='lower left')
-        comparison.append(['MIMIC', mimic_curve])
+        comparison_x.append('MIMIC')
+        comparison_y.append(mimic_fitness)
 
         legend = '{}'.format("sa")
         plt.plot(sa_curve[:,1], sa_curve[:,0], label=legend)
         plt.legend(loc='lower left')
-        comparison.append(['SA', sa_fitness])
+        comparison_x.append('SA')
+        comparison_y.append(sa_fitness)
         
         legend = '{}'.format("ga")
         plt.plot(ga_curve[:,1], ga_curve[:,0], label=legend)
         plt.legend(loc='lower left')
-        comparison.append(['GA', ga_fitness])
+        comparison_x.append('GA')
+        comparison_y.append(ga_fitness)
 
         legend = '{}'.format("rhc")
         plt.plot(rhc_curve[:,1], rhc_curve[:,0], label=legend)
         plt.legend(loc='lower left')
-        comparison.append(['RHC', rhc_curve])
+        comparison_x.append('RHC')
+        comparison_y.append(rhc_fitness)
 
         plt.savefig(IMAGE_DIR + '{}_comparison_curve'.format(title))
 
-        print(comparison)
         plt.figure()
         plt.ylabel("Fitness Score")
-        plt.plot(comparison[:,0], comparison[:,1])
+        plt.bar(comparison_x, comparison_y)
         plt.savefig(IMAGE_DIR + '{}_comparison_score'.format(title))
 
     
-#TODO: change max attempts size, and see where it calculates maximum
